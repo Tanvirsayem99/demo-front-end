@@ -1,6 +1,7 @@
 
 import "./globals.css";
-import {AuthProvider} from "./provider/provider";
+import Navbar from "./Navbar/Navbar";
+import { AuthProvider } from "./provider";
 
 
 export default function RootLayout({
@@ -9,11 +10,12 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang="en" data-theme="light">
       <body
         className=''
       >
         <AuthProvider>
+          <Navbar/>
         {children}
         </AuthProvider>
       </body>
