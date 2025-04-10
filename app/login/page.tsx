@@ -4,13 +4,16 @@ import React, { useEffect, useState } from 'react';
 import { BiHide } from "react-icons/bi";
 import { IoEyeOutline } from "react-icons/io5";
 import { ImSpinner9 } from "react-icons/im";
-import useLogin from '../hooks/singupapi/useLogin';
-import { signIn, useSession } from 'next-auth/react';
+import { useLogin } from '../hooks/singupapi/useLogin';
+
 import { useRouter } from 'next/navigation';
+import { useUser } from '../hooks/singupapi/useUser';
 
 const page = () => {
     const [hide, setHide] = useState(true);
     const [spinner, setSpinner] = useState(true);
+    const [message, setMessage] = useState("")
+    const router = useRouter()
     const handleHide =()=>{
         setHide(!hide)
         console.log("click")
@@ -19,6 +22,7 @@ const page = () => {
     const handleForm = async (event: {
         preventDefault(): unknown; target: any;  
     })=>{
+        setMessage('');
         setSpinner(false);
         event.preventDefault()
         console.log("hello")
@@ -26,17 +30,16 @@ const page = () => {
         const form = event.target;
         const email = form.email.value;
         const password = form.password.value;
-            const result = await signIn("credentials", {
-                username: email,
-              password: password,
-              redirect: true,
-              callbackUrl: "/",
-            });
-          if(result){
-            setSpinner(true)
-          }
-          
+        const result = await useLogin(email, password, setSpinner)
+        if(!result.error){
+            router.push("/")
+        }
+        setMessage(result.message)
+        console.log(result)
     }
+    
+        
+    
     return (
         <div>
         <h1 className='text-2xl font-semibold text-center pt-16'>আপনার অ্যাকাউন্টে প্রবেশ করুন</h1>
@@ -62,8 +65,11 @@ const page = () => {
                 
             </div>
             <button className='w-[500px] bg-black text-white font-semibold py-2 mt-6'>{!spinner ? <ImSpinner9 className='animate-spin text-2xl mx-auto'/> : 'লগইন'}</button>
+            {
+                message && <p className='text-red-500 text-left'>{message}</p>
+            }
             <div className='py-5'>
-                    <p>এডুসিটিতে অ্যাকাউন্ট নেই ?<Link href={"/signup"} className='text-red-500'>রেজিস্ট্রেশন করুন</Link> </p>
+                    <p>এডুসিটিতে অ্যাকাউন্ট নেই ?<Link href={"/Register"} className='text-red-500'>রেজিস্ট্রেশন করুন</Link> </p>
                 </div>
             
         </form>

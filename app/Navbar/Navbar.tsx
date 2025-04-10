@@ -1,14 +1,30 @@
 "use client"
-import { signOut, useSession } from 'next-auth/react';
+import { fetchData } from 'next-auth/client/_utils';
 import Link from 'next/link';
-import React from 'react';
+import React, { useEffect, useState } from 'react';
+import { useUser, } from '../hooks/singupapi/useUser';
+import { useLogOut } from '../hooks/singupapi/useLogOut';
+import { useRouter } from 'next/navigation';
 const Navbar =  () => {
-  const { data: session } = useSession();
-  const user = session?.user;
-  const logOut = ()=>{
-    signOut()
-  }
-  console.log(session?.user?.email);
+  const [user, setUser] = useState("")
+  const [loader, setLoader] = useState(true)
+  const router = useRouter()
+      useEffect(()=>{
+              const fetchData = async()=>{
+                  const result: any = await useUser()
+              setUser(result)
+              }
+              fetchData()
+          },[loader, user])
+     const logOut = async ()=>{
+      const result = await useLogOut()
+
+      setLoader(!loader)
+      console.log(result);
+      router.push('/')
+     }
+  
+
     return (
         <div className="navbar bg-base-100 shadow-sm">
   <div className="navbar-start">
@@ -22,13 +38,26 @@ const Navbar =  () => {
         <li><a>Item 1</a></li>
       </ul>
     </div>
-    <a className="btn btn-ghost text-xl">daisyUI</a>
+    <Link href={"/"} className="btn btn-ghost text-xl">Demo</Link>
   </div>
   <div className="navbar-center hidden lg:flex">
     <ul className="menu menu-horizontal px-1">
-      <li><Link href={"Register"}>SingUp</Link></li>
+      {
+        !user && <li><Link href={"Register"}>SingUp</Link></li>
+        
+      }
+      {
+        !user && <li><Link href={"login"}>Login</Link></li>
+        
+      }
       {
         user && <li><button onClick={()=>logOut()}>logOut</button></li>
+      }
+      {
+        user && <li><Link href={"update"}>Update-Password</Link></li>
+      }
+      {
+        user && <li><Link href={"delete"}>Delete-Account</Link></li>
       }
       
     </ul>

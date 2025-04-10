@@ -11,6 +11,7 @@ import { useRouter } from 'next/navigation';
 const page = () => {
     const [hide, setHide] = useState(true);
     const [loader, setLoader] = useState(true);
+    const [message, setMessage] = useState(null);
     const router = useRouter();
         const handleHide =()=>{
             setHide(!hide)
@@ -20,22 +21,26 @@ const page = () => {
 })=>{       setLoader(false)
             event.preventDefault()
             
-            console.log(loader)
             const form = event.target;
             const name = form.name.value;
             const email = form.email.value;
             const password = form.password.value;
             const result: any= await useSignUp(name,email,password, setLoader); 
-            console.log(result)
-            if(result){
+            if(!result.error){
                 Swal.fire({
                     position: "top-end",
                     icon: "success",
-                    title: "Your work has been saved",
+                    title: "Registration successfull",
                     showConfirmButton: false,
                     timer: 1500
                   });
-                  router.push("/")
+                  router.push("/login")
+            }
+            if(result.error){
+                if(result.error){
+                    setMessage(result.message)
+                    console.log(result.message)
+                }
             }
             
         }
@@ -66,6 +71,9 @@ const page = () => {
                     </div>
                 </div>
                 <button className='w-[500px] bg-black text-white font-semibold py-2 mt-6'>{!loader && <ImSpinner9 className='animate-spin text-2xl mx-auto'/>}{loader && 'রেজিস্ট্রেশন'}</button>
+                {
+                message && <p className='text-red-500 text-left'>{message}</p>
+            }
                 <p className='text-[10px] pt-5'>সাইন আপ করে, আপনি আমাদের ব্যবহারের শর্তাবলী এবং গোপনীয়তা নীতিতে সম্মত হয়েছেন</p>
                 <div className='flex justify-center items-center gap-1'>
                     <div className='w-[160px] bg-black h-[1px]'></div>
